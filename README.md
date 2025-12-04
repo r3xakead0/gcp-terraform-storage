@@ -7,6 +7,24 @@ Terraform configuration that provisions a Google Cloud Storage bucket with versi
 - Google Cloud project and Service Account with Storage Admin + Storage Object Admin (and permissions to use the backend bucket).
 - Service Account JSON key available locally (path set in `main.tf` as `~/terraform-key.json`, adjust if needed).
 
+## Create Service Account
+
+```sh
+# Create service account
+gcloud iam service-accounts create terraform-sa \
+    --display-name="Terraform Service Account"
+
+# Assign necessary roles
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+    --member="serviceAccount:terraform-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+    --role="roles/editor"
+
+# Create and download JSON key
+gcloud iam service-accounts keys create ~/GCP_SA.json \
+    --iam-account=terraform-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
+```
+
+
 ## Backend (remote state)
 The backend is configured in `versions.tf` to use the bucket `bootcamp-478214-tfstate` with prefix `terraform/state`. Create it once before the first `terraform init`:
 ```sh
